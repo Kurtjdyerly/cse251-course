@@ -52,23 +52,202 @@ TOP_API_URL = 'http://127.0.0.1:8790'
 # Global Variables
 call_count = 0
 
+def listToString(list):
+    str1 = ', '
+    return str1.join(list)
 
 # TODO Add your threaded class definition here
-
+class Request_Thread(threading.Thread):
+    def __init__(self, URL):
+        super().__init__()
+        self.URL = URL
+        self.response = {}
+    
+    def run(self):
+        global call_count
+        call_count += 1
+        response = requests.get(self.URL)
+        self.response = response.json()
+        
 
 # TODO Add any functions you need here
+class Film:
+    def __init__(self, id):
+        self.film_id = id
+        self.film_url = ''
+        self.film_data = {}
+        self.title = ''
+        self.director = ''
+        self.producer = ''
+        self.release_date = ''
+        self.character_count = 0
+        self.characters = []
+        self.planet_count = 0
+        self.planets = []
+        self.starship_count = 0
+        self.starships = [] 
+        self.vehicle_count = 0
+        self.vehicles = []
+        self.species_count = 0
+        self.species = []
+      
+    
+    def get_top_urls(self):
+        t = Request_Thread(TOP_API_URL)
+        t.start()
+        t.join()
+        self.film_url = t.response['films'] + self.film_id
+    
+    def get_character(self,url):
+        name = self.get_name(url)
+        self.character_count +=1
+        self.characters.append(name)
 
+    def get_characters(self, list):
+        threads = []
+        for url in list:
+            t = threading.Thread(target=self.get_character,args=(url,))
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
+    
+    def get_planet(self,url):
+        name = self.get_name(url)
+        self.planet_count +=1
+        self.planets.append(name)
+
+    def get_planets(self, list):
+        threads = []
+        for url in list:
+            t = threading.Thread(target=self.get_planet, args= (url,))
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
+    
+    def get_starship(self,url):
+        name = self.get_name(url)
+        self.starship_count +=1
+        self.starships.append(name)
+
+    def get_starships(self, list):
+        threads = []
+        for url in list:
+            t = threading.Thread(target=self.get_starship,args=(url,))
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
+    
+    def get_vehicle(self,url):
+        name = self.get_name(url)
+        self.vehicle_count +=1
+        self.vehicles.append(name)
+
+    def get_vehicles(self, list):
+        threads = []
+        for url in list:
+            t = threading.Thread(target=self.get_vehicle, args=( url,))
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
+    
+    def get_specie(self,url):
+        name = self.get_name(url)
+        self.species_count +=1
+        self.species.append(name)
+
+    def get_species(self, list):
+        threads = []
+        for url in list:
+            t = threading.Thread(target=self.get_specie,args=(url,))
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
+    
+
+
+    def get_film_data(self, url):
+        t = Request_Thread(url)
+        t.start()
+        t.join()
+        self.film_data  = t.response
+        self.title = t.response['title']
+        self.director = t.response['director']
+        self.producer = t.response['producer']
+        self.release_date = t.response['release_date']
+
+        
+    def get_name(self, url):
+        t = Request_Thread(url)
+        t.start()
+        t.join()
+        return t.response['name']
+        
+        
+        
 
 def main():
     log = Log(show_terminal=True)
     log.start_timer('Starting to retrieve data from the server')
 
     # TODO Retrieve Top API urls
+    film = Film('6')
+    film.get_top_urls()
 
-    # TODO Retireve Details on film 6
+    # TODO Retrieve Details on film 6
+    film.get_film_data(film.film_url)
+    threads = []
+    t1 = threading.Thread(target=film.get_characters, args=(film.film_data['characters'],))
+    t2 = threading.Thread(target=film.get_planets, args=(film.film_data['planets'],))
+    t3 = threading.Thread(target=film.get_starships, args=(film.film_data['starships'],))
+    t4 = threading.Thread(target=film.get_vehicles, args=(film.film_data['vehicles'],))
+    t5 = threading.Thread(target=film.get_species, args=(film.film_data['species'],))
+    
+    threads.append(t1)
+    threads.append(t2)
+    threads.append(t3)
+    threads.append(t4)
+    threads.append(t5)
+
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    
+    # film.get_characters(film.film_data['characters'])
+    # film.get_planets(film.film_data['planets'])
+    # film.get_starships(film.film_data['starships'])
+    # film.get_vehicles(film.film_data['vehicles'])
+    # film.get_species(film.film_data['species'])
+    
 
     # TODO Display results
-
+    log.write('-------------------------------------')
+    log.write(f"Title   : {film.title}")
+    log.write(f"Director: {film.director}")
+    log.write(f"Producer: {film.producer}")
+    log.write(f"Released: {film.release_date}")
+    log.write()
+    log.write(f"Characters: {film.character_count}")
+    log.write(listToString((sorted(film.characters))))
+    log.write()
+    log.write(f"Planets: {film.planet_count}")
+    log.write(listToString(sorted(film.planets)))
+    log.write()
+    log.write(f"Starships: {film.starship_count}")
+    log.write(listToString(sorted(film.starships)))
+    log.write()
+    log.write(f"Vehicles: {film.vehicle_count}")
+    log.write(listToString(sorted(film.vehicles)))
+    log.write()
+    log.write(f"Species: {film.species_count}")
+    log.write(listToString(sorted(film.species)))
+    log.write()
+    
     log.stop_timer('Total Time To complete')
     log.write(f'There were {call_count} calls to the server')
     

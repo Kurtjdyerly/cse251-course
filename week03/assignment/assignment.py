@@ -31,21 +31,21 @@ CPU_COUNT = mp.cpu_count() + 4
 
 # TODO Your final video need to have 300 processed frames.  However, while you are 
 # testing your code, set this much lower
-FRAME_COUNT = 20
+FRAME_COUNT = 300
 
 RED   = 0
 GREEN = 1
 BLUE  = 2
 
 
-def create_new_frame(image_file, green_file, process_file):
+def create_new_frame(image):
     """ Creates a new image file from image_file and green_file """
 
     # this print() statement is there to help see which frame is being processed
-    print(f'{process_file[-7:-4]}', end=',', flush=True)
+    print(f'{image[2][-7:-4]}', end=',', flush=True)
 
-    image_img = Image.open(image_file)
-    green_img = Image.open(green_file)
+    image_img = Image.open(image[0])
+    green_img = Image.open(image[1])
 
     # Make Numpy array
     np_img = np.array(green_img)
@@ -57,7 +57,7 @@ def create_new_frame(image_file, green_file, process_file):
     mask_img = Image.fromarray((mask*255).astype(np.uint8))
 
     image_new = Image.composite(image_img, green_img, mask_img)
-    image_new.save(process_file)
+    image_new.save(image[2])
 
 
 # TODO add any functions to need here
@@ -76,18 +76,30 @@ if __name__ == '__main__':
 
     # TODO Process all frames trying 1 cpu, then 2, then 3, ... to CPU_COUNT
     #      add results to xaxis_cpus and yaxis_times
-
+    images = []
+    for image_number in range(1, FRAME_COUNT):
+        image_file = rf'elephant/image{image_number:03d}.png'
+        green_file = rf'green/image{image_number:03d}.png'
+        process_file = rf'processed/image{image_number:03d}.png'
+        images.append((image_file, green_file, process_file))
+   
+    start_time = timeit.default_timer()
+    
+    for x in range(1, CPU_COUNT):
+        start_current_time = timeit.default_timer()
+        with mp.Pool(x) as p:
+            p.map(create_new_frame, images)
+        current_time = timeit.default_timer() - start_current_time
+        xaxis_cpus.append(x)
+        yaxis_times.append(current_time)
+            
 
     # sample code: remove before submitting  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     # process one frame #10
-    image_number = 10
+    
 
-    image_file = rf'elephant/image{image_number:03d}.png'
-    green_file = rf'green/image{image_number:03d}.png'
-    process_file = rf'processed/image{image_number:03d}.png'
 
-    start_time = timeit.default_timer()
-    create_new_frame(image_file, green_file, process_file)
+    # create_new_frame(image_file, green_file, process_file)
     print(f'\nTime To Process all images = {timeit.default_timer() - start_time}')
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 

@@ -66,7 +66,7 @@ class Board():
         # self.board = [['.' for _ in range(size)] for _ in range(size)]
         self.size = self.SIZE 
         self.highlighting = [[False for _ in range(self.SIZE)] for _ in range(self.SIZE)] 
-
+        self.grid_list = self.create_grid_list()
         self.board = [['L', 'S', 'O', 'D', 'A', 'E', 'O', 'M', 'A', 'A', 'I', 'I', 'A', 'S', 'S', 'A', 'M', 'G', 'R', 'C', 'O', 'D', 'A', 'I', 'R'], 
                       ['A', 'V', 'C', 'S', 'N', 'T', 'U', 'U', 'O', 'H', 'N', 'C', 'H', 'A', 'B', 'E', 'U', 'M', 'O', 'C', 'R', 'G', 'H', 'A', 'I'], 
                       ['E', 'T', 'H', 'A', 'A', 'S', 'M', 'S', 'S', 'C', 'A', 'O', 'A', 'T', 'N', 'T', 'S', 'N', 'H', 'T', 'A', 'E', 'P', 'D', 'H'], 
@@ -134,14 +134,28 @@ class Board():
                 return False
         return True
 
-    def find_word(self, word):
-        """ Find a word in the board """
-        print(f'Finding {word}...')
+    def create_grid_list(self):
+        list = []
         for row in range(self.size):
             for col in range(self.size):
                 for d in range(0, 8):
-                    if self._word_at_this_location(row, col, d, word):
-                        return True
+                    list.append((row,col,d))
+        return list
+        
+                    
+    def find_word(self, word):
+        """ Find a word in the board """
+        # print(f'Finding {word}...')
+        # for row in range(self.size):
+        #     for col in range(self.size):
+        #         for d in range(0, 8):
+        #             if self._word_at_this_location(row, col, d, word):
+        #                 return True
+        # return False
+        print(f'Finding {word}...')
+        for pos in self.grid_list:
+            if self._word_at_this_location(pos[0],pos[1],pos[2], word):
+                return True
         return False
 
 
@@ -153,7 +167,7 @@ def main():
     for word in words:
         if not board.find_word(word):
             print(f'Error: Could not find "{word}"')
-    
+   
     total_time = time.perf_counter() - start
 
     board.display()

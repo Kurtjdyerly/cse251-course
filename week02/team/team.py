@@ -25,9 +25,15 @@ from cse251 import *
 # make the API call to request data from the website
 
 class Request_thread(threading.Thread):
-    # TODO - Add code to make an API call and return the results
-    # https://realpython.com/python-requests/
-    pass
+    def __init__(self, url):
+        super().__init__()
+        self.url = url
+        self.response = {}
+
+    def run(self):
+        response = requests.get(self.url)
+        self.response = response.json()
+        
 
 class Deck:
 
@@ -39,12 +45,20 @@ class Deck:
 
     def reshuffle(self):
         print('Reshuffle Deck')
-        # TODO - add call to reshuffle
-
+        t = Request_thread(f'https://deckofcardsapi.com/api/deck/{self.id}/shuffle/')
+        t.start()
+        t.join()
 
     def draw_card(self):
-        # TODO add call to get a card
-        pass
+        if self.remaining > 0:
+            t = Request_thread(f'https://deckofcardsapi.com/api/deck/{self.id}/draw/')
+            t.start()
+            t.join()
+            if t.response != {}:
+                self.remaining = t.response['remaining']
+                return t.response['cards'][0]['code']
+            else:
+                return ''
 
     def cards_remaining(self):
         return self.remaining
@@ -63,7 +77,7 @@ if __name__ == '__main__':
     #        team_get_deck_id.py program once. You can have
     #        multiple decks if you need them
 
-    deck_id = 'ENTER ID HERE'
+    deck_id = 'eaypesucw83g'
 
     # Testing Code >>>>>
     deck = Deck(deck_id)

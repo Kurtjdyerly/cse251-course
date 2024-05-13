@@ -1,0 +1,24 @@
+12:32:18| Starting to retrieve data from the server
+12:32:54| -------------------------------------
+12:32:54| Title   : Revenge of the Sith
+12:32:54| Director: George Lucas
+12:32:54| Producer: Rick McCallum
+12:32:54| Released: 2005-05-19
+12:32:54| 
+12:32:54| Characters: 34
+12:32:54| Adi GalliaAnakin SkywalkerAyla SecuraBail Prestor OrganaBeru Whitesun larsC-3POChewbaccaDarth VaderDookuEeth KothGrievousKi-Adi-MundiKit FistoLeia OrganaLuke SkywalkerLuminara UnduliMace WinduNute GunrayObi-Wan KenobiOwen LarsPadmé AmidalaPalpatinePlo KoonPoggle the LesserR2-D2R4-P17Raymus AntillesSaesee TiinShaak TiSly MooreTarffulTion MedonWilhuff TarkinYoda
+12:32:54| 
+12:32:54| Planets: 13
+12:32:54| ['Alderaan', 'Cato Neimoidia', 'Coruscant', 'Dagobah', 'Felucia', 'Kashyyyk', 'Mustafar', 'Mygeeto', 'Naboo', 'Polis Massa', 'Saleucami', 'Tatooine', 'Utapau']
+12:32:54| 
+12:32:54| Starships: 12
+12:32:54| ['Banking clan frigte', 'Belbullab-22 starfighter', 'CR90 corvette', 'Droid control ship', 'Jedi Interceptor', 'Jedi starfighter', 'Naboo star skiff', 'Republic attack cruiser', 'Theta-class T-2c shuttle', 'Trade Federation cruiser', 'V-wing', 'arc-170']
+12:32:54| 
+12:32:54| Vehicles: 13
+12:32:54| ['AT-RT', 'AT-TE', 'Clone turbo tank', 'Corporate Alliance tank droid', 'Droid gunship', 'Droid tri-fighter', 'Emergency Firespeeder', 'LAAT/i', 'Neimoidian shuttle', 'Oevvaor jet catamaran', 'Raddaugh Gnasp fluttercraft', 'Tsmeu-6 personal wheel bike', 'Vulture Droid']
+12:32:54| 
+12:32:54| Species: 20
+12:32:54| ['Cerean', 'Chagrian', 'Clawdite', 'Droid', 'Geonosian', 'Human', 'Iktotchi', 'Kaleesh', 'Kel Dor', 'Mirialan', 'Muun', 'Pau an', 'Quermian', 'Skakoan', 'Tholothian', 'Togruta', 'Toong', 'Twi lek', 'Wookie', 'Yoda species']
+12:32:54| 
+12:32:54| Total Time To complete = 36.85795920
+12:32:54| There were 94 calls to the server

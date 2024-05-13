@@ -56,7 +56,7 @@ The assignment program will creating the following logging information.  Here is
 
 Assignments are not accepted late. Instead, you should submit what you have completed by the due date for partial credit.
 
-Assignments are individual and not team based.  Any assignments found to be  plagiarised will be graded according to the `ACADEMIC HONESTY` section in the syllabus. The Assignment will be graded in broad categories as outlined in the syllabus:
+Assignments are individual and not team based.  Any assignments found to be plagiarized will be graded according to the `ACADEMIC HONESTY` section in the syllabus. The Assignment will be graded in broad categories as outlined in the syllabus:
 
 ## Submission
 
