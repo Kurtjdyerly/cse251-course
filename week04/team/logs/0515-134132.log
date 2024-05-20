@@ -1,0 +1,11 @@
+13:41:32| finished reading file
+13:41:32| Getting request http://127.0.0.1:8790/people/30
+
+13:41:32| Getting request http://127.0.0.1:8790/people/35
+
+13:41:32| Getting request http://127.0.0.1:8790/people/52
+
+13:41:32| Getting request http://127.0.0.1:8790/people/18
+
+13:41:34| []
+13:41:34| Time to process all URLS = 1.51112460

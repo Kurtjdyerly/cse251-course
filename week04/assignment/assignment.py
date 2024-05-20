@@ -53,7 +53,7 @@ class Car():
         self.display()
            
     def display(self):
-        print(f'{self.make} {self.model}, {self.year}')
+        print(f'Made: {self.make} {self.model}, {self.year}')
 
 
 class Queue251():
@@ -76,10 +76,14 @@ class Queue251():
 class Factory(threading.Thread):
     """ This is a factory.  It will create cars and place them on the car queue """
 
-    def __init__(self):
+    def __init__(self, queue: Queue251, d_sem: threading.Semaphore, f_sem: threading.Semaphore, queue_stats: list):
         # TODO, you need to add arguments that will pass all of data that 1 factory needs
         # to create cars and to place them in a queue.
-        pass
+        self.queue = queue
+        self.d_sem = d_sem
+        self.f_sem = f_sem
+        self.queue_stats = queue_stats
+
 
 
     def run(self):
@@ -90,18 +94,27 @@ class Factory(threading.Thread):
             place the car on the queue
             signal the dealer that there is a car on the queue
            """
-
+            self.f_sem.acquire()
+            new_car = Car()
+            self.queue.put(new_car)
+            self.queue_stats[(self.queue.size() - 1)] += 1
+            self.d_sem.release()
         # signal the dealer that there there are not more cars
-        pass
+        self.d_sem.release()
+        self.queue.put(0)
+        
 
 
 class Dealer(threading.Thread):
     """ This is a dealer that receives cars """
 
-    def __init__(self):
+    def __init__(self, queue: Queue251, d_sem: threading.Semaphore, f_sem: threading.Semaphore):
         # TODO, you need to add arguments that pass all of data that 1 Dealer needs
         # to sell a car
-        pass
+        self.queue = queue
+        self.d_sem = d_sem
+        self.f_sem = f_sem
+
 
     def run(self):
         while True:
@@ -111,8 +124,18 @@ class Dealer(threading.Thread):
             signal the factory that there is an empty slot in the queue
             """
 
+            self.d_sem.acquire()
+            sold_car: Car = self.queue.get()
+            
+            if sold_car == 0:
+                self.queue.put(sold_car)
+                break
+            
+            print(f"Sold: {sold_car.make} {sold_car.model}, {sold_car.year}")
+
+            self.f_sem.release()
             # Sleep a little after selling a car
-            # Last statement in this for loop - don't change
+            # Last statement in this while loop - don't change
             time.sleep(random.random() / (SLEEP_REDUCE_FACTOR))
 
 
@@ -121,7 +144,10 @@ def main():
     log = Log(show_terminal=True)
 
     # TODO Create semaphore(s)
+    dealer_sem = threading.Semaphore(0)
+    factory_sem = threading.Semaphore(MAX_QUEUE_SIZE)
     # TODO Create queue251 
+    queue = Queue251()
     # TODO Create lock(s) ?
 
     # This tracks the length of the car queue during receiving cars by the dealership
@@ -129,12 +155,21 @@ def main():
     queue_stats = [0] * MAX_QUEUE_SIZE
 
     # TODO create your one factory
-
+    factory = Factory(queue, dealer_sem, factory_sem, queue_stats)
     # TODO create your one dealership
-
+    dealership = Dealer(queue, dealer_sem, factory_sem)
     log.start_timer()
 
     # TODO Start factory and dealership
+    dt = threading.Thread(target=dealership.run)
+    ft = threading.Thread(target=factory.run)
+
+    dt.start()
+    ft.start()
+
+    dt.join()
+    ft.join()
+
 
     # TODO Wait for factory and dealership to complete
 
