@@ -59,10 +59,10 @@ class Car():
         time.sleep(random.random() / (SLEEP_REDUCE_FACTOR))
 
         # Display the car that has was just created in the terminal
-        self.display()
+        # self.display()
            
     def display(self):
-        print(f'{self.make} {self.model}, {self.year}')
+        print(f'Made : {self.make} {self.model}, {self.year}')
 
 
 class Queue251():
@@ -87,29 +87,58 @@ class Queue251():
 class Factory(threading.Thread):
     """ This is a factory.  It will create cars and place them on the car queue """
 
-    def __init__(self):
+    def __init__(self, id, barrier: threading.Barrier, car_queue: Queue251, factory_stats: list, factory_sem: threading.Semaphore, dealership_sem: threading.Semaphore):
         self.cars_to_produce = random.randint(200, 300)     # Don't change
+        self.barrier = barrier
+        self.car_queue = car_queue
+        self.factory_stats = factory_stats
+        self.factory_sem = factory_sem
+        self.dealer_sem = dealership_sem
+        self.id = id
 
 
     def run(self):
         # TODO produce the cars, the send them to the dealerships
-
+        while True:
+            if sum(self.factory_stats) >= self.cars_to_produce:
+                break
+            self.factory_sem.acquire()
+            self.car_queue.put(Car())       
+            self.factory_stats[self.id] += 1
+            self.dealer_sem.release()
         # TODO wait until all of the factories are finished producing cars
-
+        self.barrier.wait()
         # TODO "Wake up/signal" the dealerships one more time.  Select one factory to do this
-        pass
+        if self.id == 0:
+            self.factory_sem.acquire()
+            self.car_queue.put("NO_MORE_CARS")
+            self.dealer_sem.release()
+        
 
 
 
 class Dealer(threading.Thread):
     """ This is a dealer that receives cars """
 
-    def __init__(self):
-        pass
+    def __init__(self, id, car_queue: Queue251, dealership_stats, factory_sem: threading.Semaphore, dealer_sem: threading.Semaphore):
+        self.car_queue = car_queue
+        self.dealership_stats = dealership_stats
+        self.factory_sem = factory_sem
+        self.dealer_sem = dealer_sem
+        self.id = id
 
     def run(self):
         while True:
             # TODO handle a car
+            self.dealer_sem.acquire()
+            car: Car = self.car_queue.get()
+            if car == "NO_MORE_CARS":
+                self.car_queue.put(car)
+                self.dealer_sem.release()
+                break
+            # print(f"Sold: {car.make} {car.model}, {car.year}")
+            self.dealership_stats[self.id] += 1
+            self.factory_sem.release()
 
             # Sleep a little - don't change.  This is the last line of the loop
             time.sleep(random.random() / (SLEEP_REDUCE_FACTOR + 0))
@@ -122,23 +151,41 @@ def run_production(factory_count, dealer_count):
     """
 
     # TODO Create semaphore(s) if needed
-    # TODO Create queue
+    factory_sem = threading.Semaphore(MAX_QUEUE_SIZE)
+    dealer_sem = threading.Semaphore(0)
+
+    # TODO Create queue]
+    car_queue = Queue251()
     # TODO Create lock(s) if needed
     # TODO Create barrier
+    barrier = threading.Barrier(factory_count)
 
+    factory_stats = list([0]* factory_count) 
     # This is used to track the number of cars receives by each dealer
     dealer_stats = list([0] * dealer_count)
 
     # TODO create your factories, each factory will create CARS_TO_CREATE_PER_FACTORY
-
+    factories = [Factory(id, barrier, car_queue, factory_stats, factory_sem, dealer_sem) for id in range(factory_count)]
     # TODO create your dealerships
+    dealers = [Dealer(id, car_queue, dealer_stats, factory_sem, dealer_sem) for id in range(dealer_count)]
 
     log.start_timer()
 
     # TODO Start all dealerships
+    threads = []
+    for dealership in dealers:
+        t = threading.Thread (target=dealership.run)
+        threads.append(t)
 
     # TODO Start all factories
+    for factory in factories:
+        t = threading.Thread(target=factory.run)
+        threads.append(t)
 
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
     # TODO Wait for factories and dealerships to complete
 
     run_time = log.stop_timer(f'{sum(dealer_stats)} cars have been created')

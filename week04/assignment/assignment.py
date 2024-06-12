@@ -22,7 +22,7 @@ from cse251 import *
 # Global Consts - Do not change
 CARS_TO_PRODUCE = 500
 MAX_QUEUE_SIZE = 10
-SLEEP_REDUCE_FACTOR = 50
+SLEEP_REDUCE_FACTOR = 1
 
 # NO GLOBAL VARIABLES!
 
@@ -138,7 +138,7 @@ class Dealer(threading.Thread):
             # Last statement in this while loop - don't change
             time.sleep(random.random() / (SLEEP_REDUCE_FACTOR))
 
-
+ 
 
 def main():
     log = Log(show_terminal=True)
