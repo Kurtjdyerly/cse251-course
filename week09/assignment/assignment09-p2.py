@@ -18,11 +18,13 @@ change the program to display the found path to the exit position.
 
 What would be your strategy?  
 
-<Answer here>
+My plan is to start threads at each intersection and if they reach dead end make 
+them wait until the end is reached
 
 Why would it work?
 
-<Answer here>
+I think it will work because each thread will be a while loop that tries to move 
+forward until stop is true which will happen when a thread reaches the end.
 
 """
 import math
@@ -73,14 +75,51 @@ def get_color():
     current_color_index += 1
     return color
 
-def solve_find_end(maze):
+def solve_find_end(maze: Maze,move = None, color=COLOR, cv = None):
     """ finds the end position using threads.  Nothing is returned """
     # When one of the threads finds the end position, stop all of them
     global stop
     stop = False
+    if cv == None:
+        cv = threading.Condition()
+    if move == None:
+        maze.move(*maze._start_pos, COLOR)
+        move = maze.get_start_pos()
+    current_pos = move
+    
+    with cv:
+        while not stop:
+            if maze.at_end(*current_pos):
+                stop = True
+                cv.notify_all()
+                break
+            moves = maze.get_possible_moves(*current_pos)
+            while len(moves) == 1 and not stop:
+                maze.move(*moves[0], color)
+                current_pos = moves[0]
+                moves = maze.get_possible_moves(*current_pos)
+                if maze.at_end(*current_pos):
+                    stop = True
+                    cv.notify_all()
+                    break
+            if maze.at_end(*current_pos):
+                stop = True
+                cv.notify_all() 
+                break 
+            if len(moves) == 0:
+                cv.wait()
+            if len(moves) > 1:
+                for move in moves:
+                    color = get_color()
+                    maze.move(*move, color)
+                    global thread_count
+                    t = threading.Thread(target=solve_find_end, args= (maze, move , color, cv))
+                    t.start()
+                    thread_count += 1
+        return 
 
 
-    pass
+    
 
 
 def find_end(log, filename, delay):

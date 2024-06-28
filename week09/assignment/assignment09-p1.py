@@ -2,7 +2,7 @@
 Course: CSE 251 
 Lesson Week: 09
 File: assignment09-p1.py 
-Author: <Add name here>
+Author: Kurt Dyerly
 
 Purpose: Part 1 of assignment 09, finding a path to the end position in a maze
 
@@ -27,14 +27,50 @@ FAST_SPEED = 1
 speed = SLOW_SPEED
 
 # TODO add any functions
-
-def solve_path(maze):
-    """ Solve the maze and return the path found between the start and end positions.  
-        The path is a list of positions, (x, y) """
-        
-    # TODO start add code here
+def solve_maze(maze: Maze, path: list, move):
+    maze.move(*move,COLOR)
+    path.append(move)
+    if maze.at_end(*move):
+        return True
+    moves = maze.get_possible_moves(*move)
+    for move in moves:
+        if solve_maze(maze, path, move):
+            return True
+    path.pop()
+    maze.restore(*move)
+    return False
+def solve_path(maze: Maze):
     path = []
+    solve_maze(maze, path, maze._start_pos)
     return path
+
+# def solve_path(maze:Maze,move = None, path = None):   
+#     if path is None:
+#         path = []
+#         move = maze._start_pos
+#         maze.move(*maze._start_pos, COLOR)
+#         path.append(maze._start_pos)
+    
+#     current_pos = move
+#     moves = maze.get_possible_moves(*current_pos)
+#     if maze.at_end(*current_pos):
+#         return path
+#     if len(moves) == 0:
+#         return False
+#     for move in moves:
+#         maze.move(*move, COLOR)
+#         maze.restore(*move)
+#         if maze.at_end(*current_pos):
+#             return path
+#         if solve_path(maze, move, path):
+#             path.append(current_pos)
+#             if current_pos != maze._start_pos:
+#                 return path
+#         elif not solve_path(maze, move, path) and not maze.at_end(*current_pos):
+#             return False
+#     return path
+
+
 
 
 def get_path(log, filename):

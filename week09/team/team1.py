@@ -52,13 +52,43 @@ Instructions:
 
 import time
 import threading
+import random
 
 PHILOSOPHERS = 5
 MAX_MEALS_EATEN = PHILOSOPHERS * 5
+MEALS_EATEN = 0 
 
+class Philosopher():
+    def __init__(self, id, left_fork: threading.Lock, right_fork: threading.Lock,meals eaten ,thinking_philosophers) -> None:
+        self.id = id
+        self.left_fork = left_fork
+        self.right_fork = right_fork
+
+    def dine(self):
+        while True:
+          if MAX_MEALS_EATEN <= meals_eaten:
+            break
+          while self.right_fork.locked() or self.left_fork.locked(): 
+             print(f"Philosopher{id}: is thinking")
+             time.sleep(random.randint(1,3))
+
+          self.right_fork.acquire()
+          self.left_fork.acquire()
+        
+          print(f"philosopher{id}: is eating")
+          
+          time.sleep(random.randint(1,3))
+             
+          
+            
+        
+        
 def main():
     # TODO - create the forks
+    global meals_eaten 
+  forks = [threading.Lock() for _ in range(PHILOSOPHERS)]
     # TODO - create PHILOSOPHERS philosophers
+  philosophers = [Philosopher(id) for id in range(PHILOSOPHERS)]
     # TODO - Start them eating and thinking
     # TODO - Display how many times each philosopher ate
 
